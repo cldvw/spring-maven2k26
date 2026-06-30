@@ -32,9 +32,17 @@ jobs:
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
+      # PAUSE ARTIFICIELLE POUR TE LAISSER LE TEMPS DE BASCULER LE TUNNEL
+      - name: Wait for tunnel switch
+        run: |
+          echo "=== ATTENTION : Le pipeline se met en pause pendant 45 secondes ==="
+          echo "Tu as 45 secondes pour couper ton ngrok port 9000 et le lancer sur le port 8081 !"
+          sleep 45
+          echo "=== Fin de la pause, tentative de publication sur Nexus ==="
+
       - name: Publish to Nexus
         if: github.ref == 'refs/heads/main'
-        run: ./mvnw deploy -DskipTests
+        run: mvn deploy -DskipTests -Dnexus.url=${{ secrets.NEXUS_HOST_URL }}
         env:
           NEXUS_USER: ${{ secrets.NEXUS_USER }}
           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
