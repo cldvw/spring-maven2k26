@@ -1,0 +1,44 @@
+---
+- name: Installer et configurer Apache2
+  hosts: web_servers
+  become: yes  # Utilise sudo
+
+  tasks:
+
+    - name: Mettre à jour le cache des paquets (Debian/Ubuntu)
+      apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Installer Apache2 (Debian/Ubuntu)
+      apt:
+        name: apache2
+        state: present
+      when: ansible_os_family == 'Debian'
+
+    - name: Installer Apache (RedHat/CentOS)
+      yum:
+        name: httpd
+        state: present
+      when: ansible_os_family == 'RedHat'
+
+    - name: Démarrer le service Apache et l'activer au boot
+      service:
+        name: "{{ 'apache2' if ansible_os_family == 'Debian' else 'httpd' }}"
+        state: started
+        enabled: yes
+
+    - name: Ouvrir le port HTTP (80) dans le firewall
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+      when: ansible_os_family == 'RedHat' and ansible_service_mgr == 'firewalld'
+
+    - name: Créer une page d'accueil personnalisée
+      copy:
+        content: "<h1>Bienvenue sur {{ ansible_hostname }}</h1>"
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
