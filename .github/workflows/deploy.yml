@@ -27,12 +27,11 @@ jobs:
 
       - name: SonarQube Analysis
         run: |
-          ./mvnw sonar:sonar \
+          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:5.0.0.4389:sonar \
             -Dsonar.projectKey=springboot-app \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.ws.additionalHeaders="ngrok-skip-browser-warning: true"
-            
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
       - name: Publish to Nexus
         if: github.ref == 'refs/heads/main'
         run: ./mvnw deploy -DskipTests
