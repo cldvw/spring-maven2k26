@@ -57,7 +57,7 @@
 	<distributionManagement>
 	    <repository>
 	        <id>nexus</id>
-	        <url>${nexus.url}/repository/spring-snapshots/</url>
+	        <url>${nexus.url}</url>
 	    </repository>
 	</distributionManagement>
 </project>
